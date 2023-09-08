@@ -2,8 +2,18 @@ import torch
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 D = torch.load("spm200_tokenizer_MASSIVE.pt")
+# get statistics for each language
+stats = list()
+for lang in D.keys():
+    stats.append([np.mean(D[lang]), np.std(D[lang]), lang])
+stats.sort(key=lambda x: x[0])
+for stat in stats:
+    print(f"{stat[2]} - {stat[0]:.2f} ± {stat[1]:.2f}")
+
+# visualize
 lengths, langs = [], []
 for lang in D.keys():
     langs.append(lang)
