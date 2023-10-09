@@ -1,7 +1,8 @@
-from transformers import NllbTokenizer
+from transformers import AutoTokenizer
 import datasets
 import torch
 import tqdm
+import pandas as pd
 
 
 # Langs to analyze
@@ -33,16 +34,39 @@ langs = ["ace_Arab",  "bam_Latn",  "dzo_Tibt",  "hin_Deva",	"khm_Khmr",  "mag_De
 D = {}
 
 # NLLB Tokenizer
-tokenizer = NllbTokenizer.from_pretrained("facebook/nllb-200-distilled-600M")
+tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M")
 
 # FLORES-200 dev split (997 sentences per language)
 data = datasets.load_dataset("facebook/flores", 'all', split='dev')
 
+# Create df_list
+df_list = []
+
 # Iterate through langs and get token length for each sentence in the lang
 for lang in tqdm.tqdm(langs):
-    D[lang] = list(map(len, tokenizer(data[f'sentence_{lang}'])['input_ids']))
+    sentences = data[f'sentence_{lang}']
+    tokenized_output = tokenizer(sentences)
+    token_lengths = list(map(len, tokenized_output['input_ids']))
+
+    D[lang] = token_lengths
+
+    # Convert ids to tokens
+    tokens = [tokenizer.convert_ids_to_tokens(ids,skip_special_tokens=False) for ids in tokenized_output['input_ids']]
+    print(tokens)
+    # Add to the DataFrame list
+    for sentence, token_length, token_list in zip(sentences, token_lengths, tokens):
+        df_list.append({
+            'language': lang,
+            'sentence': sentence,
+            'token_length': token_length,
+            'tokens': " ".join(token_list)
+        })
+
+# Create a DataFrame
+df = pd.DataFrame(df_list)
 
 # Save results
 torch.save(D, "spm200_tokenizer_FLORES200.pt")
+df.to_csv("FLORES200.tok.csv", index=False, encoding='')
 
 

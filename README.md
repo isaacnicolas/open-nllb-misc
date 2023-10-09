@@ -17,7 +17,7 @@ python spm200_tokenize.py
 python spm200_analysis.py
 ```
 First, the **spm200_tokenize.py** script loads the FLORES-200 dataset and uses the *facebook/nllb-200-distilled-600M* Sentencepiece tokenizer on the sentences (997 per language).  
-Then the **spm200_analysis.py** script gets stats for the token length of sentences for each language (mean, std, median, min and max) and writes it in a .txt file. Finally, distribution plots of groups of 10 languages grouped by ascending mean are saved as .png.
+Then the **spm200_analysis.py** script gets stats for the token length of sentences for each language (mean, std, median, min and max) and writes it in a .txt file. The script also saves the FLORES200.tok.csv file containing the tokenized sentences and their counts. Finally, distribution plots of groups of 10 languages grouped by ascending mean are saved as .png.
 
 ```plaintext
 ind_Latn - 29.15 ± 9.31 (median: 28.0 min: 8, max: 72)
